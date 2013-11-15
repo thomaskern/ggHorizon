@@ -9,3 +9,15 @@ smooth.spline = function(df,n,...){
   create.df(df,l$y,l$x)
 }
 
+smooth.data <- function(df,smoothing,loess.span,loess.interval,spline.n){
+  if(!is.null(smoothing) && exists(smoothing)){
+    df = ddply(df,.(group),get(paste0("smooth.",smoothing)),span=loess.span,interval=loess.interval,n=spline.n)
+  }
+  df
+}
+
+create.df = function(df,newy,newx){
+  data.frame(x=newx,y=newy,group=df$group[1])
+}
+
+
