@@ -1,6 +1,6 @@
 \name{plot_horizon}
 \alias{plot_horizon}
-\title{Create horizon graph}
+\title{Create a horizon graph}
 \usage{
   plot_horizon(data,
     mapping = aes(x = x, y = y, group = group),
@@ -9,25 +9,76 @@
     loess.span = 0.5, loess.interval = 1,
     spline.n = 3 * nrow(data))
 }
+\arguments{
+  \item{data}{only supports \code{data.frame}. The order of
+  the y-axis depends on the levels of the factor group.}
+
+  \item{mapping}{The aesthetic mapping, usually constructed
+  with \code{\link[ggplot2]{aes}} or
+  \code{\link[ggplot2]{aes_string}} . Requires at least x,y
+  and group.}
+
+  \item{num.bands}{number of bands}
+
+  \item{smoothing}{character vector. Either "loess" or
+  "splines".}
+
+  \item{band.colors}{custom colours for the bands. Requires
+  twice as many colours than num.bands. E.g. num.bands=2
+  requires \code{c(DarkNegative, BrightNegative,
+  DarkPositive, BrightPositive)}}
+
+  \item{calculate.diff}{uses the percental difference
+  between x and x+1 for the y-axis}
+
+  \item{loess.span}{parameter span of
+  \code{\link[stats]{loess}}. Only applicable if loess is
+  used for smoothing}
+
+  \item{loess.interval}{parameter interval of
+  \code{\link[stats]{loess}}. Only applicable if loess is
+  used for smoothing}
+
+  \item{spline.n}{parameter n of
+  \code{\link[stats]{spline}}. Only applicable if spline is
+  used for smoothing}
+
+  \item{reorder.by.change}{reorders the y-axis by the most
+  change, determined by summing up the absolute values of
+  positive and negative change}
+}
+\value{
+  Valid ggplot object. Any ggplot functions can be
+  added/applied, including aesthetics but can be
+  printed/saved without any changes.
+}
 \description{
   This function creates a ggplot object containing a
   horizon graph. Any ggplot manipulation is possible but
   might change the look of the graph (e.g. applying another
-  scale_x_* or scale_y_*).
+  \code{scale_x_*} or \code{scale_y_*}).
 }
 \examples{
-\donttest{
-data(stocks)
-plot_horizon(stocks,aes(x,y,group=group),num.bands=2,smoothing="loess",loess.span=0.2,loess.interval=0.5,calculate.diff=TRUE)
+\donttest{data(stocks)
 
-df = data.frame(group="A",x=0:9,y=c(0.2,0.8627684,0.92,-1,-0.8324571,-1.0061331,-0.5056517,0.1085939,0.6393061,-0.9098858))
-plot_horizon(df,aes(x,y,group=group),2,smoothing="spline", spline.n=40)
+plot_horizon(stocks,aes(x,y,group=group),num.bands=2,smoothing="loess",loess.span=0.2,
+             loess.interval=0.5,calculate.diff=TRUE)
 
-df = data.frame(group=factor(c(rep("A",9), rep("B",8))), x=c(0:8,2:9),y=c(0.8,0.4627684,0.2072174,-1,-0.8324571,-1.0061331,-0.5056517,0.1,0.3085939,-0.9098858,-0.3,-1.8324571,-1.0061331,-0.5056517,0.1085939,0.6393061,-0.9098858))
-plot_horizon(df,aes(x,y,group=group),3)
+plot_horizon(stocks[stocks$group \%in\% c("CAC","DAX"),],aes(x,y,group=group),2,
+             smoothing="spline", spline.n=40)
 
-df = data.frame(group=factor(rep(c("A","B"),each=10),levels=c("B","A")), x=0:9,y=c(0.8,0.4627684,0.2072174,-1,-0.8324571,-1.0061331,-0.5056517,0.3085939,0.4383061,-0.9098858,0.3,0.1627684,0.3072174,-0.3,-1.8324571,-1.0061331,-0.5056517,0.1085939,0.6393061,-0.9098858))
-plot_horizon(df,aes(x,y,group=group),2,smoothing="spline", spline.n=40)
+plot_horizon(stocks,aes(x,y,group=group),3)
+
+plot_horizon(stocks,aes(x,y,group=group),2,
+             smoothing="spline", spline.n=40)
+
+plot_horizon(stocks,aes(x,y,group=group),2,
+            band.colors=c("grey10","grey80","red1","red4"),calculate.diff=T,smoothing="loess")
 }
+}
+\references{
+  \url{http://vis.stanford.edu/files/2009-TimeSeries-CHI.pdf}
+
+  \url{https://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=1532144}
 }
 

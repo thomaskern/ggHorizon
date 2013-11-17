@@ -8,7 +8,8 @@ Depends:
     R (>= 3.0.2),
     ggplot2 (>= 0.9.3),
     plyr (>= 1.8),
-    RColorBrewer (>= 1.0.5)
+    RColorBrewer (>= 1.0.5),
+    proto
 License: GPL (>= 2)
 LazyData: true
 Collate:

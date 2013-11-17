@@ -44,6 +44,6 @@ add.fill = function(colors,fill.id,labels){
 }
 
 create.blank.ggplot = function(){
-  ggplot() + default_theme()
+  ggplot() + default_theme() + scale_x_continuous(expand=c(0,0))
 }
 
