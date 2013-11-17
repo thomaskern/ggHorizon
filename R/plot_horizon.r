@@ -43,24 +43,27 @@ padding = function(x,xs,nrows){
 
 counter = function(vals,start=0) start:(length(vals)-(1-start))
 
-bands = function(df.all,counter,counter_labels,num.bands,grounds,fill.id){
+bands = function(df.all,counter,counter_labels,num.bands,grounds,fill.id,invert.negative){
   mapply(function(df,counter){
            lapply(seq(num.bands),function(xs){
                     add.band(adjust.band.data(df,
                                               steps(df.all$y,num.bands),
-                                              grounds[counter+1],xs),
+                                              grounds[counter+1],xs,
+                                              invert.negative),
                              pick.colors(fill.id,xs))})}, 
          rev(split(df.all,df.all$group)),
          counter_labels) 
 }
 
-adjust.band.data = function(df,step,ground,i){
+adjust.band.data = function(df,step,ground,i,invert.negative){
   df$y = adjust.y.values(df$y,step,i)
   df = Reduce(function(x,xs) padding(x,xs,nrow(df)),which(df$y == 0),df)
   df$ymin = ground
   df$ymax = df$y + ground
-  df[df$splitter == 2,"ymin"] = ground + step - abs(df[df$splitter == 2,"ymax"] - ground)
-  df[df$splitter == 2,"ymax"] = ground + step 
+  if(invert.negative){
+    df$ymin[df$splitter == 2] = ground + step - abs(df$ymax[df$splitter == 2] - ground)
+    df$ymax[df$splitter == 2] = ground + step 
+  }
   df
 }
 
@@ -73,7 +76,7 @@ add.band = function(df,colors){
   list(add.area(df,colors[[1]],colors[[2]])) 
 }
 
-plot.bands = function(df.all,num.bands,user.colors){
+plot.bands = function(df.all,num.bands,user.colors,invert.negative){
   fill.id = LETTERS[1:(num.bands*2)]
   y_labels = rev(levels(df.all$group))
   grounds = steps(df.all$y,num.bands) * 0:(length(y_labels)-1)
@@ -82,7 +85,7 @@ plot.bands = function(df.all,num.bands,user.colors){
       add.fill(get.colors(user.colors,num.bands),
                fill.id,
                labels(df.all$y,c(-1,1),num.bands)) +
-      bands(df.all,counter,counter(y_labels),num.bands,grounds,fill.id) + 
+      bands(df.all,counter,counter(y_labels),num.bands,grounds,fill.id,invert.negative) + 
       add.lines.and.labels(grounds,y_labels,steps(df.all$y,num.bands))
 }
 
@@ -163,6 +166,7 @@ reverse.mapping = function(mapping){
 #' @param loess.interval parameter interval of \code{\link[stats]{loess}}. Only applicable if loess is used for smoothing
 #' @param spline.n parameter n of \code{\link[stats]{spline}}. Only applicable if spline is used for smoothing
 #' @param reorder.by.change reorders the y-axis by the most change, determined by summing up the absolute values of positive and negative change
+#' @param invert.negative flips the negative bands upside down
 #' @export
 #' @examples
 #' \donttest{data(stocks)
@@ -174,6 +178,8 @@ reverse.mapping = function(mapping){
 #'              smoothing="spline", spline.n=40) 
 #'
 #' plot_horizon(stocks,aes(x,y,group=group),3)
+#'
+#' plot_horizon(stocks,aes(x,y,group=group),3, smoothing="loess",invert.negative=TRUE)
 #' 
 #' plot_horizon(stocks,aes(x,y,group=group),2,
 #'              smoothing="spline", spline.n=40)
@@ -184,7 +190,8 @@ reverse.mapping = function(mapping){
 plot_horizon = function(data,mapping=aes(x=x,y=y,group=group),num.bands=2,smoothing=NULL,band.colors=NULL,
                         calculate.diff=FALSE,
                         reorder.by.change=TRUE,
-                        loess.span=0.5,loess.interval=1,spline.n=3*nrow(data)){
+                        loess.span=0.5,loess.interval=1,spline.n=3*nrow(data),
+                        invert.negative=FALSE){
   plot.bands(ddply(smooth.data(re.order(calculate.diff(rename(data,reverse.mapping(mapping)),
                                               calculate.diff),
                                         reorder.by.change),
@@ -195,5 +202,6 @@ plot_horizon = function(data,mapping=aes(x=x,y=y,group=group),num.bands=2,smooth
                    .(group),
                    data.prep),
              num.bands,
-             band.colors)
+             band.colors,
+             invert.negative)
 }
