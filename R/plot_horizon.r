@@ -23,8 +23,7 @@ create.entry = function(mod,x,xs,pos){
 }
 
 interval.x.axis = function(x,xs,mod){
-  ret = abs(x[get(mod)(xs,1),"x"]-x[xs,"x"])/2
-  ret
+  abs(x[get(mod)(xs,1),"x"]-x[xs,"x"])/2
 }
 
 insert.zero = function(mod,x,xs,pos,nrows){
@@ -60,6 +59,9 @@ adjust.band.data = function(df,step,ground,i){
   df = Reduce(function(x,xs) padding(x,xs,nrow(df)),which(df$y == 0),df)
   df$ymin = ground
   df$ymax = df$y + ground
+  #df[df$splitter == 2,"ymin"] = ground + step - abs(df[df$splitter == 2,"ymax"] - ground)
+  #df[df$splitter == 2,"ymax"] = ground + step 
+  #df[df$splitter == 2,"ymin"] = abs(df[df$splitter == 2,"ymin"] + ground)
   df
 }
 
