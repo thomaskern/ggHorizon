@@ -61,7 +61,6 @@ adjust.band.data = function(df,step,ground,i){
   df$ymax = df$y + ground
   df[df$splitter == 2,"ymin"] = ground + step - abs(df[df$splitter == 2,"ymax"] - ground)
   df[df$splitter == 2,"ymax"] = ground + step 
-  #df[df$splitter == 2,"ymin"] = abs(df[df$splitter == 2,"ymin"] + ground)
   df
 }
 
