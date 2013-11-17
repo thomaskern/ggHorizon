@@ -7,7 +7,7 @@
     num.bands = 2, smoothing = NULL, band.colors = NULL,
     calculate.diff = FALSE, reorder.by.change = TRUE,
     loess.span = 0.5, loess.interval = 1,
-    spline.n = 3 * nrow(data))
+    spline.n = 3 * nrow(data), invert.bands = NULL)
 }
 \arguments{
   \item{data}{only supports \code{data.frame}. The order of
@@ -46,6 +46,9 @@
   \item{reorder.by.change}{reorders the y-axis by the most
   change, determined by summing up the absolute values of
   positive and negative change}
+
+  \item{invert.bands}{flips bands upside down. Values can
+  either be "neg" or "pos".}
 }
 \value{
   Valid ggplot object. Any ggplot functions can be
@@ -68,6 +71,8 @@ plot_horizon(stocks[stocks$group \%in\% c("CAC","DAX"),],aes(x,y,group=group),2,
              smoothing="spline", spline.n=40)
 
 plot_horizon(stocks,aes(x,y,group=group),3)
+
+plot_horizon(stocks,aes(x,y,group=group),3, smoothing="loess",invert.bands=TRUE)
 
 plot_horizon(stocks,aes(x,y,group=group),2,
              smoothing="spline", spline.n=40)
